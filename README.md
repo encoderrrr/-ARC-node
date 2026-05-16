@@ -1,6 +1,6 @@
 <img width="2000" height="2000" alt="Black Blue Minimalist Floral Logo" src="https://github.com/user-attachments/assets/8e134c21-4983-4660-843d-098e41202beb" />
 
-cat > README.md << 'EOF'
+
 # 🌐 Arc Network Node & Contributor Hub
 
 Run, sync, and contribute to the Arc Testnet with a full node setup guide.
