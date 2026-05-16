@@ -7,7 +7,7 @@ Run, sync, and contribute to the Arc Testnet with a full node setup guide.
 
 ## Initial Setup
 
-\`\`\`bash
+```bash
 sudo apt update
 sudo apt install -y build-essential pkg-config libssl-dev clang curl git
 
@@ -17,11 +17,11 @@ source ~/.cargo/env
 curl -L https://foundry.paradigm.xyz | bash
 source ~/.bashrc
 foundryup
-\`\`\`
+```
 
 ## Build Node
 
-\`\`\`bash
+```bash
 cd ~
 git clone https://github.com/circlefin/arc-node.git
 cd arc-node
@@ -34,19 +34,19 @@ cargo install --path crates/snapshots --force
 
 echo 'source ~/.cargo/env' >> ~/.bashrc
 source ~/.bashrc
-\`\`\`
+```
 
 ## Snapshot Initialization
 
-\`\`\`bash
+```bash
 mkdir -p ~/.arc/execution ~/.arc/consensus
 sudo install -d -o \$USER /run/arc
 arc-snapshots download --chain=arc-testnet
-\`\`\`
+```
 
 ## Terminal 1 → Execution Layer
 
-\`\`\`bash
+```bash
 arc-node-execution node \
   --chain arc-testnet \
   --datadir ~/.arc/execution \
@@ -61,14 +61,14 @@ arc-node-execution node \
   --metrics 127.0.0.1:9001 \
   --enable-arc-rpc \
   --rpc.forwarder https://rpc.quicknode.testnet.arc.network/
-\`\`\`
+```
 
 <img width="1445" height="734" alt="1" src="https://github.com/user-attachments/assets/998970bb-d33e-488b-85b4-894cd93e450d" />
 
 
 ## Terminal 2 → Consensus Layer
 
-\`\`\`bash
+```bash
 arc-node-consensus init --home ~/.arc/consensus
 
 arc-node-consensus start \
@@ -81,16 +81,16 @@ arc-node-consensus start \
   --follow.endpoint https://rpc.quicknode.testnet.arc.network,wss=rpc.quicknode.testnet.arc.network \
   --follow.endpoint https://rpc.blockdaemon.testnet.arc.network,wss=rpc.blockdaemon.testnet.arc.network \
   --metrics 127.0.0.1:29000
-\`\`\`
+```
 
 <img width="1462" height="767" alt="2" src="https://github.com/user-attachments/assets/eb257fdd-8e41-4f8e-8458-8c9721c1d139" />
 
 
 ## Check Node
 
-\`\`\`bash
+```bash
 cast block-number --rpc-url http://localhost:8545
-\`\`\`
+```
 
 <img width="660" height="45" alt="3" src="https://github.com/user-attachments/assets/df6b7808-bd7a-47c5-ad0a-b44ef9e444d5" />
 
