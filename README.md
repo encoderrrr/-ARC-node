@@ -96,3 +96,97 @@ cast block-number --rpc-url http://localhost:8545
 
 If block numbers increase continuously, your node is healthy.
 EOF
+
+## Ready! The systemd service version for automatically running the Arc node
+```bash
+sudo nano /etc/systemd/system/arc-execution.service
+```
+## Paste the content below into the file, then press Ctrl+X, then Y, then Enter
+
+```bash
+[Unit]
+Description=Arc Network Execution Layer
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+Environment="PATH=/home/ubuntu/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ExecStart=/home/ubuntu/.cargo/bin/arc-node-execution node \
+  --chain arc-testnet \
+  --datadir /home/ubuntu/.arc/execution \
+  --disable-discovery \
+  --ipcpath /run/arc/reth.ipc \
+  --auth-ipc \
+  --auth-ipc.path /run/arc/auth.ipc \
+  --http \
+  --http.addr 127.0.0.1 \
+  --http.port 8545 \
+  --http.api eth,net,web3,txpool,trace,debug \
+  --metrics 127.0.0.1:9001 \
+  --enable-arc-rpc \
+  --rpc.forwarder https://rpc.quicknode.testnet.arc.network/
+
+Restart=always
+RestartSec=10
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## Step 2: Create the Consensus Layer service
+```bash
+sudo nano /etc/systemd/system/arc-consensus.service
+```
+```bash[Unit]
+Description=Arc Network Consensus Layer
+After=network.target arc-execution.service
+Wants=arc-execution.service
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+Environment="PATH=/home/ubuntu/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ExecStart=/home/ubuntu/.cargo/bin/arc-node-consensus start \
+  --home /home/ubuntu/.arc/consensus \
+  --eth-socket /run/arc/reth.ipc \
+  --execution-socket /run/arc/auth.ipc \
+  --rpc.addr 127.0.0.1:31000 \
+  --follow \
+  --follow.endpoint https://rpc.drpc.testnet.arc.network,wss=rpc.drpc.testnet.arc.network \
+  --follow.endpoint https://rpc.quicknode.testnet.arc.network,wss=rpc.quicknode.testnet.arc.network \
+  --follow.endpoint https://rpc.blockdaemon.testnet.arc.network,wss=rpc.blockdaemon.testnet.arc.network \
+  --metrics 127.0.0.1:29000
+
+Restart=always
+RestartSec=10
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## Step 3: Enable the services
+```bash
+# Reload services
+sudo systemctl daemon-reload
+```
+# Enable services
+```bash
+sudo systemctl enable arc-execution.service
+sudo systemctl enable arc-consensus.service
+```
+# Start services
+```bash
+sudo systemctl start arc-execution.service
+sudo systemctl start arc-consensus.service
+```
+# Check status
+```bash
+sudo systemctl status arc-execution.service
+sudo systemctl status arc-consensus.service
+```
+
